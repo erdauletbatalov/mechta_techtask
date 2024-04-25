@@ -9,10 +9,6 @@ import (
 	"sync"
 )
 
-const (
-	fileName = "input.json"
-)
-
 type Numbers struct {
 	A int `json:"a"`
 	B int `json:"b"`
@@ -27,33 +23,35 @@ func sum(numbers []Numbers, start, end int, ch chan int) {
 }
 
 func main() {
-	if len(os.Args) != 2 {
-		fmt.Println("Usage: go run sum_calculator.go <num_goroutines>")
+	if len(os.Args) != 3 {
+		fmt.Println("Usage: go run sum_calculator.go <input_file> <num_goroutines>")
 		return
 	}
 
 	if os.Args[1] == "-h" || os.Args[1] == "--help" {
-		fmt.Println("Usage: go run sum_calculator.go <num_goroutines>")
+		fmt.Println("Usage: go run sum_calculator.go <input.json> <num_goroutines>")
 		return
 	}
 
-	if _, err := os.Stat(fileName); os.IsNotExist(err) {
-		fmt.Println("Error: input.json file does not exist")
-		return
-	}
-
-	if os.Args[1] == "0" {
+	if os.Args[2] == "0" {
 		fmt.Println("Error: num_goroutines cannot be 0")
 		return
 	}
 
-	numGoroutines, err := strconv.Atoi(os.Args[1])
+	numGoroutines, err := strconv.Atoi(os.Args[2])
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
 	}
 
-	file, err := ioutil.ReadFile(fileName)
+	inputFile := os.Args[1]
+
+	if _, err := os.Stat(inputFile); os.IsNotExist(err) {
+		fmt.Printf("Error: %v file does not exist\n", inputFile)
+		return
+	}
+
+	file, err := ioutil.ReadFile(inputFile)
 	if err != nil {
 		fmt.Println("Error reading file:", err)
 		return

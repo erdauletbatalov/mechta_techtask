@@ -18,8 +18,7 @@ type Numbers struct {
 	B int `json:"b"`
 }
 
-func sum(numbers []Numbers, start, end int, wg *sync.WaitGroup, ch chan int) {
-	defer wg.Done()
+func sum(numbers []Numbers, start, end int, ch chan int) {
 	sum := 0
 	for i := start; i < end; i++ {
 		sum += numbers[i].A + numbers[i].B
@@ -80,7 +79,10 @@ func main() {
 		if i == numGoroutines-1 {
 			end = totalNumbers
 		}
-		go sum(numbers, start, end, &wg, ch)
+		go func(start, end int) {
+			defer wg.Done()
+			sum(numbers, start, end, ch)
+		}(start, end)
 	}
 
 	go func() {
